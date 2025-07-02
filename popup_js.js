@@ -89,7 +89,7 @@ class TradingAssistantPopup {
     downloadTemplates() {
         // Open templates page
         chrome.tabs.create({ 
-            url: 'https://github.com/yourusername/TraderChromer/tree/main/templates'
+            url: 'https://github.com/Tariqlearnstocode/TraderChromer/tree/main/templates'
         });
     }
 
