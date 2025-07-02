@@ -156,6 +156,15 @@
             color: #ff4444;
         }
         
+        .case.best-guess {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 3px solid #ffd700;
+        }
+        
+        .case.best-guess h4 {
+            color: #ffd700;
+        }
+        
         .hidden {
             display: none;
         }
@@ -163,6 +172,31 @@
         .interval-display {
             font-size: 12px;
             color: #888;
+        }
+        
+        .indicators-display {
+            background: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 8px;
+            min-height: 40px;
+            font-size: 12px;
+            color: #ccc;
+        }
+        
+        .indicators-display.empty {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .indicator-tag {
+            display: inline-block;
+            background: #00ff88;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 2px;
+            font-size: 11px;
         }
     </style>
 </head>
@@ -191,6 +225,15 @@
     </div>
     
     <div class="section">
+        <label for="indicators">Chart Setup:</label>
+        <div id="indicatorsList" class="indicators-display"></div>
+        <div class="button-group" style="margin-top: 5px;">
+            <button id="downloadTemplates" class="btn-primary" style="flex: 2;">Get AI Templates</button>
+            <button id="captureIndicators" class="btn-secondary" style="flex: 1;">Custom Setup</button>
+        </div>
+    </div>
+    
+    <div class="section">
         <label for="interval">Screenshot Interval:</label>
         <select id="interval">
             <option value="5">5 seconds</option>
@@ -204,7 +247,10 @@
     </div>
     
     <div class="button-group">
-        <button id="selectArea" class="btn-secondary">Select Area</button>
+        <button id="selectArea" class="btn-secondary">Select Chart Area</button>
+    </div>
+    
+    <div class="button-group">
         <button id="startCapture" class="btn-primary">Start Capture</button>
     </div>
     

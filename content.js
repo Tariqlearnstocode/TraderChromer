@@ -4,14 +4,17 @@ class TradingAreaSelector {
         this.overlay = null;
         this.isSelecting = false;
         this.selectedArea = null;
+
+        this.currentAreaType = 'chart';
         this.startX = 0;
         this.startY = 0;
         this.selectionBox = null;
     }
 
-    activate() {
+    activate(areaType = 'chart') {
         if (this.isSelecting) return;
         
+        this.currentAreaType = areaType;
         this.createOverlay();
         this.isSelecting = true;
         document.body.style.cursor = 'crosshair';
@@ -79,20 +82,24 @@ class TradingAreaSelector {
             return;
         }
         
-        this.selectedArea = {
+        const areaData = {
             x: rect.left,
             y: rect.top,
             width: rect.width,
             height: rect.height
         };
         
-        // Save selected area
-        chrome.storage.local.set({ selectedArea: this.selectedArea });
+        if (this.currentAreaType === 'chart') {
+            this.selectedArea = areaData;
+            chrome.storage.local.set({ selectedArea: this.selectedArea });
+            this.showConfirmation('Chart area selected! You can now start capturing.');
+
+        } else if (this.currentAreaType === 'indicators') {
+            this.showConfirmation('Processing indicators...');
+            processIndicatorScreenshot(areaData);
+        }
         
         this.cleanup();
-        
-        // Show confirmation
-        this.showConfirmation();
     }
 
     cleanup() {
@@ -110,7 +117,7 @@ class TradingAreaSelector {
         this.isSelecting = false;
     }
 
-    showConfirmation() {
+    showConfirmation(message = 'Area selected!') {
         const confirmation = document.createElement('div');
         confirmation.style.cssText = `
             position: fixed;
@@ -124,7 +131,7 @@ class TradingAreaSelector {
             font-family: Arial, sans-serif;
             font-weight: bold;
         `;
-        confirmation.textContent = 'Area selected! You can now start capturing.';
+        confirmation.textContent = message;
         
         document.body.appendChild(confirmation);
         
@@ -182,7 +189,7 @@ class TradingCapture {
     }
 
     async captureAndAnalyze() {
-        const settings = await chrome.storage.local.get(['selectedArea', 'apiKey', 'position', 'strategy']);
+        const settings = await chrome.storage.local.get(['selectedArea', 'apiKey', 'position', 'strategy', 'indicators']);
         
         if (!settings.selectedArea || !settings.apiKey) {
             console.log('Missing required settings for capture');
@@ -190,7 +197,7 @@ class TradingCapture {
         }
         
         try {
-            // Capture the selected area
+            // Capture the chart area
             const screenshot = await this.captureArea(settings.selectedArea);
             
             // Send to AI for analysis
@@ -276,16 +283,31 @@ class TradingCapture {
 
     async analyzeScreenshot(screenshot, settings) {
         const prompt = `
-You are a trading AI assistant. Analyze this chart screenshot and provide a brief long case and short case.
+You are an expert trading analyst. Analyze this chart screenshot and provide concise long and short cases.
 
 Current position: ${settings.position || 'none'}
 Trading strategy: ${settings.strategy || 'Not specified'}
+${settings.indicators && settings.indicators.length > 0 ? `Chart indicators: ${settings.indicators.join(', ')}` : ''}
 
-Provide your analysis in this exact JSON format:
+Focus on:
+- Price action and trend direction
+- Support/resistance levels
+- Volume patterns
+- Technical indicators visible
+- Market structure
+
+Respond in JSON format:
 {
-    "longCase": "Brief bullish case in 50 words or less",
-    "shortCase": "Brief bearish case in 50 words or less"
+    "longCase": "Bullet points with **bold headers** for bullish case",
+    "shortCase": "Bullet points with **bold headers** for bearish case", 
+    "bestGuess": "Your overall recommendation with **bold headers**",
+    "keyLevels": {
+        "support": "specific levels",
+        "resistance": "specific levels"
+    }
 }
+
+Use • bullet points, **bold** headers, actual price levels, and specific observations.
         `.trim();
 
         try {
@@ -365,6 +387,151 @@ Provide your analysis in this exact JSON format:
     }
 }
 
+// Indicator capture functionality
+async function captureIndicators() {
+    // Create overlay for indicator selection
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family: Arial, sans-serif;
+    `;
+    
+    overlay.innerHTML = `
+        <div style="background: #2a2a2a; padding: 20px; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0 0 15px 0; color: #00ff88;">Capture Chart Elements</h3>
+            <p style="margin: 0 0 15px 0;">Click and drag to select your chart's indicator panel/legend</p>
+            <button id="startIndicatorCapture" style="
+                background: #00ff88; 
+                color: #000; 
+                border: none; 
+                padding: 10px 20px; 
+                border-radius: 4px; 
+                cursor: pointer;
+                margin-right: 10px;
+            ">Start Selection</button>
+            <button id="cancelIndicatorCapture" style="
+                background: #666; 
+                color: white; 
+                border: none; 
+                padding: 10px 20px; 
+                border-radius: 4px; 
+                cursor: pointer;
+            ">Cancel</button>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    document.getElementById('startIndicatorCapture').onclick = () => {
+        overlay.remove();
+        // Activate area selector for indicators
+        window.tradingAreaSelector.activate('indicators');
+    };
+    
+    document.getElementById('cancelIndicatorCapture').onclick = () => {
+        overlay.remove();
+    };
+}
+
+async function processIndicatorScreenshot(area) {
+    try {
+        // Capture the indicator area
+        const screenshot = await window.tradingCapture.captureArea(area);
+        
+        // Send to AI to parse indicators
+        const settings = await chrome.storage.local.get(['apiKey']);
+        if (!settings.apiKey) {
+            throw new Error('API key required');
+        }
+        
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${settings.apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o',
+                messages: [{
+                    role: 'user',
+                    content: [
+                        {
+                            type: 'text',
+                            text: 'Extract all technical indicators from this screenshot. Return a JSON array of indicator names with their settings (e.g., "RSI(14)", "EMA(20)", "MACD(12,26,9)"). Only return the JSON array, nothing else.'
+                        },
+                        {
+                            type: 'image_url',
+                            image_url: {
+                                url: screenshot,
+                                detail: 'high'
+                            }
+                        }
+                    ]
+                }],
+                max_tokens: 200
+            })
+        });
+        
+        const data = await response.json();
+        if (data.choices && data.choices[0]) {
+            let content = data.choices[0].message.content.trim();
+            
+            // Clean up response
+            content = content.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
+            
+            try {
+                const indicators = JSON.parse(content);
+                
+                // Save indicators
+                await chrome.storage.local.set({ indicators: indicators });
+                
+                // Show success message
+                const confirmation = document.createElement('div');
+                confirmation.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #00ff88;
+                    color: #000;
+                    padding: 15px 20px;
+                    border-radius: 4px;
+                    z-index: 999999;
+                    font-family: Arial, sans-serif;
+                    font-weight: bold;
+                    max-width: 300px;
+                `;
+                confirmation.innerHTML = `
+                    <div>Indicators captured successfully!</div>
+                    <div style="font-size: 12px; margin-top: 5px;">${indicators.join(', ')}</div>
+                `;
+                
+                document.body.appendChild(confirmation);
+                
+                setTimeout(() => {
+                    confirmation.remove();
+                }, 5000);
+                
+            } catch (parseError) {
+                throw new Error('Failed to parse indicator list');
+            }
+        }
+        
+    } catch (error) {
+        console.error('Indicator capture error:', error);
+        alert(`Failed to capture indicators: ${error.message}`);
+    }
+}
+
 // Initialize classes
 window.tradingAreaSelector = new TradingAreaSelector();
 window.tradingCapture = new TradingCapture();
@@ -372,7 +539,9 @@ window.tradingCapture = new TradingCapture();
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'selectArea') {
-        window.tradingAreaSelector.activate();
+        window.tradingAreaSelector.activate(message.areaType);
+    } else if (message.type === 'captureIndicators') {
+        captureIndicators();
     } else if (message.type === 'startCapture') {
         window.tradingCapture.start(message.interval);
     } else if (message.type === 'stopCapture') {

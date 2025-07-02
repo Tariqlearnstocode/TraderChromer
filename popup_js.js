@@ -4,6 +4,8 @@ class TradingAssistantPopup {
         this.isCapturing = false;
         this.captureInterval = null;
         this.selectedArea = null;
+
+        this.indicators = [];
         this.init();
     }
 
@@ -11,10 +13,14 @@ class TradingAssistantPopup {
         this.loadSettings();
         this.bindEvents();
         this.updateUI();
+        this.displayIndicators();
     }
 
     bindEvents() {
-        document.getElementById('selectArea').addEventListener('click', () => this.selectArea());
+        document.getElementById('selectArea').addEventListener('click', () => this.selectArea('chart'));
+
+        document.getElementById('captureIndicators').addEventListener('click', () => this.captureIndicators());
+        document.getElementById('downloadTemplates').addEventListener('click', () => this.downloadTemplates());
         document.getElementById('startCapture').addEventListener('click', () => this.startCapture());
         document.getElementById('stopCapture').addEventListener('click', () => this.stopCapture());
         
@@ -25,13 +31,18 @@ class TradingAssistantPopup {
     }
 
     async loadSettings() {
-        const settings = await chrome.storage.local.get(['apiKey', 'position', 'strategy', 'interval', 'selectedArea']);
+        const settings = await chrome.storage.local.get(['apiKey', 'position', 'strategy', 'interval', 'selectedArea', 'indicators']);
         
         if (settings.apiKey) document.getElementById('apiKey').value = settings.apiKey;
         if (settings.position) document.getElementById('position').value = settings.position;
         if (settings.strategy) document.getElementById('strategy').value = settings.strategy;
         if (settings.interval) document.getElementById('interval').value = settings.interval;
         if (settings.selectedArea) this.selectedArea = settings.selectedArea;
+
+        if (settings.indicators) {
+            this.indicators = settings.indicators;
+            this.displayIndicators();
+        }
     }
 
     async saveSettings() {
@@ -45,18 +56,54 @@ class TradingAssistantPopup {
         await chrome.storage.local.set(settings);
     }
 
-    async selectArea() {
+    async selectArea(type = 'chart') {
         try {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
             
             // Send message to content script to activate area selector
-            await chrome.tabs.sendMessage(tab.id, { type: 'selectArea' });
+            await chrome.tabs.sendMessage(tab.id, { type: 'selectArea', areaType: type });
             
             // Close popup to allow selection
             window.close();
         } catch (error) {
             console.error('Error selecting area:', error);
             alert('Failed to select area. Please try again.');
+        }
+    }
+
+    async captureIndicators() {
+        try {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            
+            // Send message to capture indicators
+            await chrome.tabs.sendMessage(tab.id, { type: 'captureIndicators' });
+            
+            // Close popup
+            window.close();
+        } catch (error) {
+            console.error('Error capturing indicators:', error);
+            alert('Failed to capture indicators. Please try again.');
+        }
+    }
+
+    downloadTemplates() {
+        // Open templates page
+        chrome.tabs.create({ 
+            url: 'https://github.com/yourusername/TraderChromer/tree/main/templates'
+        });
+    }
+
+    displayIndicators() {
+        const indicatorsList = document.getElementById('indicatorsList');
+        
+        if (this.indicators.length === 0) {
+            indicatorsList.innerHTML = '<span style="color: #666; font-style: italic;">Click "Get AI Templates" for optimized TradingView setup</span>';
+            indicatorsList.className = 'indicators-display empty';
+        } else {
+            indicatorsList.innerHTML = this.indicators.map(indicator => 
+                `<span class="indicator-tag">${indicator}</span>`
+            ).join('');
+            indicatorsList.className = 'indicators-display';
         }
     }
 
@@ -149,15 +196,39 @@ function displayAnalysis(analysis) {
     const analysisDiv = document.getElementById('analysis');
     const contentDiv = document.getElementById('analysisContent');
     
+    // Convert markdown-style formatting to HTML
+    const formatText = (text) => {
+        if (!text) return '';
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
+            .replace(/\n/g, '<br>') // Line breaks
+            .replace(/• /g, '&bull; '); // Bullet points
+    };
+    
     contentDiv.innerHTML = `
         <div class="case long">
             <h4>Long Case:</h4>
-            <p>${analysis.longCase}</p>
+            <div>${formatText(analysis.longCase)}</div>
         </div>
         <div class="case short">
             <h4>Short Case:</h4>
-            <p>${analysis.shortCase}</p>
+            <div>${formatText(analysis.shortCase)}</div>
         </div>
+        ${analysis.bestGuess ? `
+        <div class="case best-guess">
+            <h4>Best Guess:</h4>
+            <div>${formatText(analysis.bestGuess)}</div>
+        </div>
+        ` : ''}
+        ${analysis.keyLevels ? `
+        <div class="case key-levels">
+            <h4>Key Levels:</h4>
+            <div>
+                <strong>Support:</strong> ${analysis.keyLevels.support}<br>
+                <strong>Resistance:</strong> ${analysis.keyLevels.resistance}
+            </div>
+        </div>
+        ` : ''}
         <div style="margin-top: 10px; font-size: 12px; color: #888;">
             Last updated: ${new Date().toLocaleTimeString()}
         </div>

@@ -1,0 +1,271 @@
+{
+  "name": "AI Day Trading Setup - TraderChromer",
+  "description": "Optimized for AI analysis of day trading setups. Features faster EMAs (9,21,50), VWAP with deviations, RSI, and volume for intraday moves.",
+  "charts": [
+    {
+      "panes": [
+        {
+          "sources": [
+            {
+              "type": "MainSeries",
+              "id": "price",
+              "state": {
+                "style": 1,
+                "esdShowDividends": true,
+                "esdShowSplits": true,
+                "esdShowEarnings": true,
+                "esdShowBreaks": false,
+                "esdFlagSize": 2
+              }
+            },
+            {
+              "type": "Study",
+              "id": "ema_9",
+              "state": {
+                "styles": {
+                  "plot_0": {
+                    "linestyle": 0,
+                    "linewidth": 2,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 0,
+                    "color": "#FF1744"
+                  }
+                },
+                "precision": "default",
+                "inputs": {
+                  "length": 9,
+                  "source": "close",
+                  "offset": 0
+                },
+                "study": "Moving Average Exponential@tv-basicstudies",
+                "showInDataWindow": true,
+                "visible": true
+              }
+            },
+            {
+              "type": "Study",
+              "id": "ema_21",
+              "state": {
+                "styles": {
+                  "plot_0": {
+                    "linestyle": 0,
+                    "linewidth": 2,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 0,
+                    "color": "#FF9800"
+                  }
+                },
+                "precision": "default",
+                "inputs": {
+                  "length": 21,
+                  "source": "close",
+                  "offset": 0
+                },
+                "study": "Moving Average Exponential@tv-basicstudies",
+                "showInDataWindow": true,
+                "visible": true
+              }
+            },
+            {
+              "type": "Study",
+              "id": "ema_50",
+              "state": {
+                "styles": {
+                  "plot_0": {
+                    "linestyle": 0,
+                    "linewidth": 3,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 0,
+                    "color": "#4CAF50"
+                  }
+                },
+                "precision": "default",
+                "inputs": {
+                  "length": 50,
+                  "source": "close",
+                  "offset": 0
+                },
+                "study": "Moving Average Exponential@tv-basicstudies",
+                "showInDataWindow": true,
+                "visible": true
+              }
+            },
+            {
+              "type": "Study",
+              "id": "vwap_with_bands",
+              "state": {
+                "styles": {
+                  "plot_0": {
+                    "linestyle": 0,
+                    "linewidth": 3,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 0,
+                    "color": "#FFEB3B"
+                  },
+                  "plot_1": {
+                    "linestyle": 2,
+                    "linewidth": 1,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 30,
+                    "color": "#FFEB3B"
+                  },
+                  "plot_2": {
+                    "linestyle": 2,
+                    "linewidth": 1,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 30,
+                    "color": "#FFEB3B"
+                  },
+                  "plot_3": {
+                    "linestyle": 2,
+                    "linewidth": 1,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 50,
+                    "color": "#FFEB3B"
+                  },
+                  "plot_4": {
+                    "linestyle": 2,
+                    "linewidth": 1,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 50,
+                    "color": "#FFEB3B"
+                  }
+                },
+                "precision": "default",
+                "inputs": {
+                  "anchor": "Session",
+                  "source": "hlc3",
+                  "offset": 0,
+                  "showBands": true,
+                  "stdevMult": 2,
+                  "stdev2Mult": 3
+                },
+                "bands": [
+                  {
+                    "color": "#FFEB3B",
+                    "linestyle": 0,
+                    "linewidth": 1,
+                    "visible": true,
+                    "highPlot": 1,
+                    "lowPlot": 2,
+                    "transparency": 85
+                  },
+                  {
+                    "color": "#FFEB3B",
+                    "linestyle": 0,
+                    "linewidth": 1,
+                    "visible": true,
+                    "highPlot": 3,
+                    "lowPlot": 4,
+                    "transparency": 90
+                  }
+                ],
+                "study": "Volume Weighted Average Price@tv-basicstudies",
+                "showInDataWindow": true,
+                "visible": true
+              }
+            }
+          ]
+        },
+        {
+          "sources": [
+            {
+              "type": "Study",
+              "id": "volume",
+              "state": {
+                "styles": {
+                  "vol": {
+                    "linestyle": 0,
+                    "linewidth": 1,
+                    "plottype": 5,
+                    "trackPrice": false,
+                    "transparency": 0,
+                    "color": "#26A69A"
+                  },
+                  "vol_ma": {
+                    "linestyle": 0,
+                    "linewidth": 1,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 0,
+                    "color": "#FF5252"
+                  }
+                },
+                "precision": "default",
+                "inputs": {
+                  "showMA": true,
+                  "maLength": 20,
+                  "maSource": "volume"
+                },
+                "study": "Volume@tv-basicstudies",
+                "showInDataWindow": true,
+                "visible": true
+              }
+            }
+          ]
+        },
+        {
+          "sources": [
+            {
+              "type": "Study",
+              "id": "rsi",
+              "state": {
+                "styles": {
+                  "plot_0": {
+                    "linestyle": 0,
+                    "linewidth": 2,
+                    "plottype": 0,
+                    "trackPrice": false,
+                    "transparency": 0,
+                    "color": "#E91E63"
+                  }
+                },
+                "precision": "default",
+                "inputs": {
+                  "length": 14,
+                  "source": "close"
+                },
+                "bands": [
+                  {
+                    "color": "#FF5252",
+                    "linestyle": 2,
+                    "linewidth": 1,
+                    "visible": true,
+                    "value": 70
+                  },
+                  {
+                    "color": "#4CAF50",
+                    "linestyle": 2,
+                    "linewidth": 1,
+                    "visible": true,
+                    "value": 30
+                  },
+                  {
+                    "color": "#757575",
+                    "linestyle": 2,
+                    "linewidth": 1,
+                    "visible": true,
+                    "value": 50
+                  }
+                ],
+                "study": "Relative Strength Index@tv-basicstudies",
+                "showInDataWindow": true,
+                "visible": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timeframe": "5",
+  "timezone": "America/New_York"
+} 
