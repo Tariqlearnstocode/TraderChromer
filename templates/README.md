@@ -1,111 +1,67 @@
-# TraderChromer AI-Optimized TradingView Templates
+# Optimal Trading Indicators for AI Analysis
 
-These TradingView chart templates are specifically designed for optimal AI analysis with the TraderChromer extension. Each template contains the perfect combination of indicators for accurate AI-powered trading insights.
+The TraderChromer extension works best when you have the right indicators on your chart. Here are the optimal setups for each trading style:
 
-## 📥 **How to Import Templates**
+## 🎯 Scalping (1m-2m charts)
+**Best for: Quick scalps, momentum plays**
 
-### **Step 1: Download Template**
-- Right-click on the desired `.json` file above
-- Select "Save Link As" or "Download"
-- Save to your computer
-
-### **Step 2: Import to TradingView**
-1. Open [TradingView.com](https://tradingview.com)
-2. Open any chart
-3. Click the **"Templates"** button (usually in top toolbar)
-4. Select **"Load Template"**
-5. Choose the downloaded `.json` file
-6. Click **"Apply"**
-
-### **Step 3: Verify Setup**
-Your chart should now display the AI-optimized indicator layout. You're ready to use TraderChromer for analysis!
+**Required Indicators:**
+- **EMA(20, 50, 200)** - Trend hierarchy
+- **VWAP with Bands** - Institutional levels  
+- **RSI(14)** - Momentum signals
+- **Volume + MA(20)** - Volume confirmation
+- **Bollinger Bands(20,2)** - Volatility bands
 
 ---
 
-## 🎯 **Available Templates**
+## 📈 Day Trading (5m-15m charts)  
+**Best for: Intraday swings, VWAP plays**
 
-### **1. AI Scalping Setup** (`AI_Scalping_Setup.json`)
-**Best for: 1-minute charts, quick scalps**
-
-**Timeframe:** 1-minute  
-**Indicators:**
-- ✅ **EMA(20, 50, 200)** - Trend hierarchy in orange, teal, blue
-- ✅ **VWAP with Bands** - Yellow line with deviation bands
-- ✅ **RSI(14)** - Purple line with 30/70 levels
-- ✅ **Volume with MA(20)** - Green bars with red moving average
-- ✅ **Bollinger Bands(20,2)** - Purple bands with fill
-
-**Use Case:** Fast intraday moves, momentum scalping, quick entries/exits
+**Required Indicators:**
+- **EMA(9, 21, 50)** - Fast trend signals
+- **VWAP with Deviation Bands** - Key institutional levels
+- **RSI(14)** - Overbought/oversold levels
+- **Volume + MA(20)** - Volume confirmation
 
 ---
 
-### **2. AI Swing Trading Setup** (`AI_Swing_Trading_Setup.json`)
-**Best for: 15-minute to 4-hour charts, swing trades**
+## 📊 Swing Trading (1h-4h charts)
+**Best for: Multi-day holds, trend following**
 
-**Timeframe:** 15-minute  
-**Indicators:**
-- ✅ **EMA(20, 50, 200)** - Trend direction in orange, teal, blue
-- ✅ **VWAP Daily** - Yellow institutional level
-- ✅ **MACD(12,26,9)** - Blue/red lines with green histogram
-- ✅ **RSI(14)** - Purple with 30/70 overbought/oversold
-- ✅ **Volume Profile** - Orange volume distribution (left side)
-
-**Use Case:** Multi-day holds, trend following, institutional level analysis
+**Required Indicators:**
+- **EMA(20, 50, 200)** - Long-term trend
+- **VWAP Daily** - Daily institutional level
+- **MACD(12,26,9)** - Trend changes
+- **RSI(14)** - Momentum confirmation  
+- **Volume Profile** - Key price levels
 
 ---
 
-### **3. AI Day Trading Setup** (`AI_Day_Trading_Setup.json`)
-**Best for: 5-minute charts, intraday trading**
+## 🤖 How to Use with TraderChromer
 
-**Timeframe:** 5-minute  
-**Indicators:**
-- ✅ **EMA(9, 21, 50)** - Fast trend in red, orange, green
-- ✅ **VWAP with Multiple Bands** - Yellow with 2σ and 3σ deviations
-- ✅ **RSI(14)** - Pink with 30/50/70 levels
-- ✅ **Volume with MA(20)** - Green bars with red average
+1. **Select your timeframe** in the extension popup
+2. **Add the recommended indicators** to your chart
+3. **Click "Detect My Setup"** to let AI identify your indicators
+4. **Take screenshot** and get AI analysis
 
-**Use Case:** Active day trading, mean reversion plays, VWAP strategies
+The AI will provide better analysis when you use these optimal indicator combinations!
 
 ---
 
-## 🤖 **Why These Indicators for AI?**
+## 💡 Pro Tips
 
-### **Clear Visual Hierarchy**
-- Each indicator has distinct colors for AI recognition
-- No overlapping or confusing signals
-- Clean, uncluttered appearance
+- **Don't add extra indicators** - more isn't always better for AI analysis
+- **Use consistent colors** - helps AI recognition
+- **Keep charts clean** - remove unnecessary overlays
+- **Match timeframes** - use the timeframe you selected in the extension
 
-### **Proven Combinations**
-- **Trend + Momentum + Volume** = Complete picture
-- **Multiple timeframe context** with EMAs
-- **Institutional levels** with VWAP
-- **Overbought/oversold** signals with RSI
+## ❓ Can't Add These Indicators?
 
-### **AI Training Optimized**
-- Standard parameter settings (RSI 14, MACD 12,26,9)
-- Common indicator combinations
-- Proper color coding for pattern recognition
-
----
-
-## 🚀 **Pro Tips**
-
-### **For Best AI Analysis:**
-1. **Use the templates as-is** - Don't modify indicator settings
-2. **Clean chart background** - Use default TradingView themes
-3. **Remove extra elements** - Hide unnecessary info boxes
-4. **Consistent timeframes** - Match template recommendations
-
-### **Template Switching:**
-- **Scalping Template** → 1m/2m charts
-- **Day Trading Template** → 5m/15m charts  
-- **Swing Trading Template** → 1h/4h/daily charts
-
-### **After Import:**
-1. Set appropriate timeframe
-2. Select your trading symbol
-3. Start TraderChromer analysis
-4. Enjoy accurate AI insights! 🎯
+If your platform doesn't have these indicators:
+1. Use what you have available
+2. Click "Detect My Setup" anyway  
+3. The AI will work with whatever indicators it can see
+4. Consider switching to TradingView (free) for full indicator access
 
 ---
 

@@ -20,23 +20,29 @@ class TradingAssistantPopup {
         document.getElementById('selectArea').addEventListener('click', () => this.selectArea('chart'));
 
         document.getElementById('captureIndicators').addEventListener('click', () => this.captureIndicators());
-        document.getElementById('downloadTemplates').addEventListener('click', () => this.downloadTemplates());
         document.getElementById('startCapture').addEventListener('click', () => this.startCapture());
         document.getElementById('stopCapture').addEventListener('click', () => this.stopCapture());
         
+        // Handle timeframe selection
+        document.getElementById('timeframe').addEventListener('change', (e) => this.showOptimalIndicators(e.target.value));
+        
         // Save settings on change
-        ['apiKey', 'position', 'strategy', 'interval'].forEach(id => {
+        ['apiKey', 'position', 'strategy', 'interval', 'timeframe'].forEach(id => {
             document.getElementById(id).addEventListener('change', () => this.saveSettings());
         });
     }
 
     async loadSettings() {
-        const settings = await chrome.storage.local.get(['apiKey', 'position', 'strategy', 'interval', 'selectedArea', 'indicators']);
+        const settings = await chrome.storage.local.get(['apiKey', 'position', 'strategy', 'interval', 'selectedArea', 'indicators', 'timeframe']);
         
         if (settings.apiKey) document.getElementById('apiKey').value = settings.apiKey;
         if (settings.position) document.getElementById('position').value = settings.position;
         if (settings.strategy) document.getElementById('strategy').value = settings.strategy;
         if (settings.interval) document.getElementById('interval').value = settings.interval;
+        if (settings.timeframe) {
+            document.getElementById('timeframe').value = settings.timeframe;
+            this.showOptimalIndicators(settings.timeframe);
+        }
         if (settings.selectedArea) this.selectedArea = settings.selectedArea;
 
         if (settings.indicators) {
@@ -50,7 +56,8 @@ class TradingAssistantPopup {
             apiKey: document.getElementById('apiKey').value,
             position: document.getElementById('position').value,
             strategy: document.getElementById('strategy').value,
-            interval: parseInt(document.getElementById('interval').value)
+            interval: parseInt(document.getElementById('interval').value),
+            timeframe: document.getElementById('timeframe').value
         };
         
         await chrome.storage.local.set(settings);
@@ -86,18 +93,50 @@ class TradingAssistantPopup {
         }
     }
 
-    downloadTemplates() {
-        // Open templates page
-        chrome.tabs.create({ 
-            url: 'https://github.com/Tariqlearnstocode/TraderChromer/tree/main/templates'
-        });
+    showOptimalIndicators(timeframe) {
+        const indicatorSection = document.getElementById('optimalIndicators');
+        const setupDisplay = document.getElementById('recommendedSetup');
+        
+        const optimalSetups = {
+            scalping: [
+                'EMA(20, 50, 200)',
+                'VWAP with Bands',
+                'RSI(14)',
+                'Volume + MA(20)',
+                'Bollinger Bands(20,2)'
+            ],
+            day: [
+                'EMA(9, 21, 50)',
+                'VWAP with Deviation Bands',
+                'RSI(14)',
+                'Volume + MA(20)'
+            ],
+            swing: [
+                'EMA(20, 50, 200)',
+                'VWAP Daily',
+                'MACD(12,26,9)',
+                'RSI(14)',
+                'Volume Profile'
+            ]
+        };
+        
+        if (timeframe && optimalSetups[timeframe]) {
+            const indicators = optimalSetups[timeframe];
+            setupDisplay.innerHTML = indicators.map(indicator => 
+                `<span class="indicator-tag">${indicator}</span>`
+            ).join('');
+            setupDisplay.classList.remove('empty');
+            indicatorSection.style.display = 'block';
+        } else {
+            indicatorSection.style.display = 'none';
+        }
     }
 
     displayIndicators() {
         const indicatorsList = document.getElementById('indicatorsList');
         
         if (this.indicators.length === 0) {
-            indicatorsList.innerHTML = '<span style="color: #666; font-style: italic;">Click "Get AI Templates" for optimized TradingView setup</span>';
+            indicatorsList.innerHTML = '<span style="color: #666; font-style: italic;">Select your timeframe above, then click "Detect My Setup"</span>';
             indicatorsList.className = 'indicators-display empty';
         } else {
             indicatorsList.innerHTML = this.indicators.map(indicator => 

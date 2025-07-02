@@ -225,11 +225,25 @@
     </div>
     
     <div class="section">
-        <label for="indicators">Chart Setup:</label>
+        <label for="timeframe">Trading Timeframe:</label>
+        <select id="timeframe">
+            <option value="">Select your timeframe...</option>
+            <option value="scalping">Scalping (1m-2m)</option>
+            <option value="day">Day Trading (5m-15m)</option>
+            <option value="swing">Swing Trading (1h-4h)</option>
+        </select>
+    </div>
+
+    <div class="section" id="optimalIndicators" style="display: none;">
+        <label>Optimal Indicators for AI Analysis:</label>
+        <div id="recommendedSetup" class="indicators-display"></div>
+    </div>
+
+    <div class="section">
+        <label for="indicators">Your Current Chart Setup:</label>
         <div id="indicatorsList" class="indicators-display"></div>
         <div class="button-group" style="margin-top: 5px;">
-            <button id="downloadTemplates" class="btn-primary" style="flex: 2;">Get AI Templates</button>
-            <button id="captureIndicators" class="btn-secondary" style="flex: 1;">Custom Setup</button>
+            <button id="captureIndicators" class="btn-primary" style="flex: 1;">Detect My Setup</button>
         </div>
     </div>
     

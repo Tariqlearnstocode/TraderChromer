@@ -158,7 +158,7 @@ class TradingCapture {
     async start(interval) {
         if (this.isCapturing) return;
         
-        const settings = await chrome.storage.local.get(['selectedArea', 'apiKey', 'position', 'strategy']);
+        const settings = await chrome.storage.local.get(['selectedArea', 'apiKey', 'position', 'strategy', 'timeframe']);
         
         if (!settings.selectedArea) {
             alert('Please select an area first');
@@ -189,7 +189,7 @@ class TradingCapture {
     }
 
     async captureAndAnalyze() {
-        const settings = await chrome.storage.local.get(['selectedArea', 'apiKey', 'position', 'strategy', 'indicators']);
+        const settings = await chrome.storage.local.get(['selectedArea', 'apiKey', 'position', 'strategy', 'indicators', 'timeframe']);
         
         if (!settings.selectedArea || !settings.apiKey) {
             console.log('Missing required settings for capture');
@@ -282,19 +282,29 @@ class TradingCapture {
     }
 
     async analyzeScreenshot(screenshot, settings) {
+        const timeframeMap = {
+            'scalping': '1-2 minute charts (scalping)',
+            'day': '5-15 minute charts (day trading)',
+            'swing': '1-4 hour charts (swing trading)'
+        };
+        
+        const timeframeContext = settings.timeframe ? timeframeMap[settings.timeframe] || settings.timeframe : 'Not specified';
+        
         const prompt = `
 You are an expert trading analyst. Analyze this chart screenshot and provide concise long and short cases.
 
+Trading timeframe: ${timeframeContext}
 Current position: ${settings.position || 'none'}
 Trading strategy: ${settings.strategy || 'Not specified'}
 ${settings.indicators && settings.indicators.length > 0 ? `Chart indicators: ${settings.indicators.join(', ')}` : ''}
 
-Focus on:
+Focus on timeframe-appropriate analysis:
 - Price action and trend direction
-- Support/resistance levels
+- Support/resistance levels  
 - Volume patterns
 - Technical indicators visible
 - Market structure
+- Entry/exit timing for the specified timeframe
 
 Respond in JSON format:
 {
